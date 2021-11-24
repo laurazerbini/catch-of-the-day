@@ -15,18 +15,29 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    // console.log("MOUNTED");
-    const {params} = this.props.match
+    const { params } = this.props.match
+    // first we need to reinstate the local Storage
+    const localStorageRef = localStorage.getItem(params.storeId);
+    if (localStorageRef) {
+      this.setState({ order: JSON.parse(localStorageRef) });
+    }
     this.ref = base.syncState(`${params.storeId}/fishes`, {
       context: this,
       state: 'fishes'
     });
   }
   
+  componentDidUpdate() {
+    // console.log(this.state.order)
+    localStorage.setItem(
+      this.props.match.params.storeId, 
+      JSON.stringify(this.state.order)
+    );
+  }
+
   componentWillUnmount() {
     // console.log("UNMOUNTED");
     base.removeBinding(this.ref);
-
   }
 
   addFish = fish => {
@@ -37,6 +48,24 @@ class App extends React.Component {
     // 3. set the new fishes object to state
     this.setState({ fishes });
     // console.log('adding a fish');
+  };
+
+  updateFish = (key, updatedFish) => {
+    // 1. Take a copy of the current state
+    const fishes = { ...this.state.fishes };
+    // 2. Update that state
+    fishes[key] = updatedFish;
+    // 3. Set that to state
+    this.setState({ fishes });
+  };
+
+  deleteFish = (key) => {
+    // 1. take a copy of state
+    const fishes = { ...this.state.fishes };
+    // 2. reset the state
+    fishes[key] = null;
+    // 3. update the state
+    this.setState({ fishes });
   };
 
   loadSampleFishes = () => {
@@ -70,7 +99,13 @@ class App extends React.Component {
           </ul>
         </div>
         <Order fishes={this.state.fishes} order={this.state.order}/>
-        <Inventory addFish={this.addFish} loadSampleFishes={this.loadSampleFishes} />
+        <Inventory 
+          addFish={this.addFish} 
+          updateFish={this.updateFish}
+          deleteFish={this.updateFish}
+          loadSampleFishes={this.loadSampleFishes} 
+          fishes={this.state.fishes} 
+        />
       </div>
     )
   }

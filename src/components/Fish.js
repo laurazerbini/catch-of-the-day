@@ -1,4 +1,5 @@
 import React from 'react';
+// eslint-disable-next-line
 import AddFishForm from './AddFishForm';
 import {formatPrice} from '../helpers';
 

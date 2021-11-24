@@ -2,10 +2,12 @@ import React from 'react';
 import {formatPrice} from '../helpers';
 
 class Order extends React.Component {
-  renderOrder = (key) => {
+  renderOrder = key => {
     const fish = this.props.fishes[key];
     const count = this.props.order[key];
-    const isAvailable = fish.status === 'available'
+    const isAvailable = fish && fish.status === "available";
+    // make sure that the fish is loaded before we continue
+    if(!fish) return null; 
     if(!isAvailable) {
       return <li key={key}>
         Sorry but {fish ? fish.name : 'fish'} is not available
@@ -21,7 +23,7 @@ class Order extends React.Component {
 
   render() {
     const orderIds = Object.keys(this.props.order);
-    const total = orderIds.reduce((prevTotal, key) => {
+    const total = orderIds.reduce((prevTotal, key) => { 
       const fish = this.props.fishes[key];
       const count = this.props.order[key];
       const isAvailable = fish && fish.status === 'available';
